@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Franchise Admins List</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Branch</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for franchise_admin in franchise_admins %}
+        <tr>
+          <td>{{ franchise_admin.name }}</td>
+          <td>{{ franchise_admin.email }}</td>
+          <td>{{ franchise_admin.phone }}</td>
+          <td>{{ franchise_admin.branch }}</td>
+          <td>{{ franchise_admin.get_status_display }}</td>
+          <td>
+            <a href="{% url 'view-franchise-admin' franchise_admin.id %}">
+              View
+            </a>
+            <a href="{% url 'update-franchise-admin' franchise_admin.id %}">
+              Update
+            </a>
+            <a href="{% url 'delete-franchise-admin' franchise_admin.id %}">
+              Delete
+            </a>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <a href="{% url 'add-franchise-admin' %}">Add Franchise Admin</a>
+{% endblock %}

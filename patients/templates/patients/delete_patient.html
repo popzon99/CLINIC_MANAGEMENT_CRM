@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Patient</title>
+    <!-- Include your styles here -->
+</head>
+<body>
+    <div class="container">
+        <h2 class="page-title">Delete Patient</h2>
+        <form class="delete-form" method="post">
+            {% csrf_token %}
+            <p>Are you sure you want to delete the patient: {{ patient.name }}?</p>
+            
+            <!-- Delete Button -->
+            <div class="form-actions">
+                <button type="submit" class="btn-delete">Delete</button>
+                <a href="{% url 'patient_list' %}" class="btn-cancel">Cancel</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

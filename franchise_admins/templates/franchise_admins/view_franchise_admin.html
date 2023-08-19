@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>View Franchise Admin</h2>
+  <p>Name: {{ franchise_admin.name }}</p>
+  <p>Email: {{ franchise_admin.email }}</p>
+  <p>Phone: {{ franchise_admin.phone }}</p>
+  <p>Branch: {{ franchise_admin.branch }}</p>
+  <p>Role: {{ franchise_admin.get_role_display }}</p>
+  <p>Status: {{ franchise_admin.get_status_display }}</p>
+  <a href="{% url 'franchise-admins-list' %}">Back to List</a>
+{% endblock %}

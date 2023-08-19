@@ -38,12 +38,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'superadmin',
-    'admins',
+    'franchise_admins',
     'branches',
     'physiotherapists',
     'patients',
     'appointments',
     'treatments',
+    'receptionist',
 ]
 
 MIDDLEWARE = [

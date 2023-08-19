@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add New Therapist</title>
+    <style>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+            }
+    
+            h1 {
+                text-align: center;
+                margin-top: 20px;
+            }
+    
+            form {
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 20px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+            }
+    
+            label {
+                display: block;
+                font-weight: bold;
+                margin-top: 10px;
+            }
+    
+            input[type="text"],
+            input[type="email"],
+            input[type="password"],
+            select {
+                width: 100%;
+                padding: 8px;
+                margin-top: 5px;
+                margin-bottom: 15px;
+                border: 1px solid #ccc;
+                border-radius: 3px;
+                box-sizing: border-box;
+            }
+    
+            label.radio {
+                margin-top: 0;
+                font-weight: normal;
+            }
+    
+            input[type="radio"] {
+                margin-right: 5px;
+            }
+    
+            label.checkbox {
+                display: inline-block;
+                margin-right: 10px;
+            }
+    
+            .time-slot-input {
+                width: 60%;
+                padding: 5px;
+                border: 1px solid #ccc;
+                border-radius: 3px;
+                box-sizing: border-box;
+            }
+    
+            label.file-upload {
+                cursor: pointer;
+                display: inline-block;
+                padding: 6px 12px;
+                background-color: #337ab7;
+                color: #fff;
+                border-radius: 3px;
+                border: none;
+            }
+    
+            .button-container {
+                text-align: center;
+                margin-top: 20px;
+            }
+    
+            .cancel-button {
+                background-color: #ccc;
+            }
+    </style>
+</head>
+<body>
+    <h1>ADD NEW THERAPIST</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label for="{{ form.name.id_for_label }}">Name:</label>
+        {{ form.name }}
+        <br>
+        <label for="{{ form.address.id_for_label }}">Address:</label>
+        {{ form.address }}
+        <br>
+        <label for="{{ form.specialities.id_for_label }}">Select Specialities:</label>
+        {{ form.specialities }}
+        <br>
+        <label for="{{ form.branch.id_for_label }}">Select Branch:</label>
+        {{ form.branch }}
+        <br>
+        <label for="{{ form.phone.id_for_label }}">Phone Number:</label>
+        {{ form.phone }}
+        <br>
+        <label for="{{ form.date_of_birth.id_for_label }}">Date of Birth:</label>
+        {{ form.date_of_birth }}
+        <br>
+        <label>Gender:</label>
+        {{ form.gender }}
+        <br>
+        <label for="{{ form.slots_per_minute.id_for_label }}">Select Slots/Minute:</label>
+        {{ form.slots_per_minute }}
+        <br>
+        <label>Working Days:</label>
+        <div>
+            {% for day in form.working_days %}
+                <label class="checkbox">
+                    {{ day.tag }} {{ day.choice_label }}
+                </label>
+            {% endfor %}
+        </div>
+        <br>
+        <label>Time Slots:</label>
+        <div>
+            {% for day in form.working_days %}
+                <label>{{ day.tag }}</label>
+                <input type="text" class="time-slot-input" name="time_slot_{{ day.day_name }}" placeholder="e.g. 09:00-12:00, 14:00-18:00">
+                <br>
+            {% endfor %}
+        </div>
+        
+        <br>
+        <label for="{{ form.profile_photo.id_for_label }}">Upload Profile Photo:</label>
+        {{ form.profile_photo }}
+        <br>
+        <h2>TITLE (CREATE LOGIN)</h2>
+        <label for="{{ form.email.id_for_label }}">Email:</label>
+        {{ form.email }}
+        <br>
+        <label for="{{ form.password1.id_for_label }}">Set Password:</label>
+        {{ form.password1 }}
+        <br>
+        <label for="{{ form.password2.id_for_label }}">Confirm Password:</label>
+        {{ form.password2 }}
+        <br>
+        <label for="{{ form.upload_photo.id_for_label }}">Upload Photo:</label>
+        {{ form.upload_photo }}
+        <br>
+        <button type="submit">Create</button>
+    </form>
+    <button onclick="window.history.back()">Cancel</button>
+</body>
+</html>
+

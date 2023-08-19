@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Therapist Profile</title>
+    <style>
+        .popup-card {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            z-index: 9999;
+            display: none;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+        }
+        .popup-card.active,
+        .overlay.active {
+            display: block;
+        }
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay" id="overlay"></div>
+    <div class="popup-card" id="popup-card">
+        <span class="close-button" id="close-button">&times;</span>
+        <h1>Therapist Profile</h1>
+        <p>Name: {{ therapist.name }}</p>
+        <p>Address: {{ therapist.address }}</p>
+        <p>Branch: {{ therapist.branch }}</p>
+        <p>Qualification: {{ therapist.qualification }}</p>
+        <p>Specialities: {% for speciality in therapist.specialities.all %}{{ speciality.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+        <p>Gender: {{ therapist.gender }}</p>
+        <p>Slots per Minute: {{ therapist.slots_per_minute }}</p>
+        <p>Working Days: {% for day in therapist.working_days.all %}{{ day.day_name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+    </div>
+
+    <script>
+        const overlay = document.getElementById('overlay');
+        const popupCard = document.getElementById('popup-card');
+        const closeButton = document.getElementById('close-button');
+
+        function openPopup() {
+            overlay.classList.add('active');
+            popupCard.classList.add('active');
+        }
+
+        function closePopup() {
+            overlay.classList.remove('active');
+            popupCard.classList.remove('active');
+        }
+
+        overlay.addEventListener('click', closePopup);
+        closeButton.addEventListener('click', closePopup);
+    </script>
+</body>
+</html>
+

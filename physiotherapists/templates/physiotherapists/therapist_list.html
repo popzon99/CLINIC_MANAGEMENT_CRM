@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Therapist List</title>
+    <style>
+        .active-button {
+            background-color: green;
+            color: white;
+        }
+        .inactive-button {
+            background-color: red;
+            color: white;
+        }
+        .view-button {
+            background-color: blue;
+            color: white;
+        }
+        .update-button {
+            background-color: orange;
+            color: white;
+        }
+        .delete-button {
+            background-color: red;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Therapist List</h1>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Branch</th>
+            <th>Qualification</th>
+            <th>Specialities</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+        {% for therapist in therapists %}
+        <tr>
+            <td>{{ therapist.name }}</td>
+            <td>{{ therapist.branch }}</td>
+            <td>{{ therapist.qualification }}</td>
+            <td>
+                {% for speciality in therapist.specialities.all %}
+                    {{ speciality.name }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% if therapist.is_active %}
+                    <button class="active-button">Active</button>
+                {% else %}
+                    <button class="inactive-button">Inactive</button>
+                {% endif %}
+            </td>
+            <td>
+                <a href="{% url 'physiotherapists:therapist_profile' therapist.id %}">
+                    <button class="view-button">View</button>
+                </a>
+                <a href="{% url 'physiotherapists:update_therapist' therapist.id %}">
+                    <button class="update-button">Update</button>
+                </a>
+                <a href="{% url 'physiotherapists:delete_therapist' therapist.id %}">
+                    <button class="delete-button">Delete</button>
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
+
