@@ -1,55 +1,27 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import User
-from .models import Patient, PatientLogin
+from .models import Patient, Tag
 
-# Inline for PatientLogin
-class PatientLoginInline(admin.StackedInline):
-    model = PatientLogin
-    can_delete = False
-    verbose_name_plural = 'Login Information'
+class TagAdmin(admin.ModelAdmin):
+    list_display = ('name',)
 
-# Custom UserAdmin with PatientLoginInline
-class CustomUserAdmin(UserAdmin):
-    inlines = (PatientLoginInline,)
-
-# Register User with CustomUserAdmin
-admin.site.unregister(User)
-admin.site.register(User, CustomUserAdmin)
-
-@admin.register(Patient)
 class PatientAdmin(admin.ModelAdmin):
-    list_display = ('name', 'gender', 'date_of_birth', 'email')
-    list_filter = ('gender',)
-    search_fields = ('name', 'email')
+    list_display = ('user', 'gender', 'location', 'date_added', 'patient_id')
+    list_filter = ('gender', 'location', 'date_added')
+    search_fields = ('user__first_name', 'user__last_name', 'patient_id')
+
     fieldsets = (
         ('Personal Information', {
-            'fields': ('name', 'address', 'specialities', 'location', 'phone', 'date_of_birth', 'gender')
+            'fields': ('user', 'address', 'phone', 'date_of_birth', 'gender', 'profile_photo', 'tags')
         }),
         ('Medical Information', {
             'fields': ('height', 'weight', 'blood_group', 'notes')
         }),
-        ('Login Information', {
-            'fields': ('email', 'profile_photo')
+        ('Additional Information', {
+            'fields': ('location', 'specialities', 'date_added', 'patient_id')
         }),
     )
-    inlines = (PatientLoginInline,)
-    actions = ['make_active', 'make_inactive']
 
-    def make_active(self, request, queryset):
-        queryset.update(user__is_active=True)
-    make_active.short_description = "Activate selected patients"
-
-    def make_inactive(self, request, queryset):
-        queryset.update(user__is_active=False)
-    make_inactive.short_description = "Deactivate selected patients"
-
-@admin.register(PatientLogin)
-class PatientLoginAdmin(admin.ModelAdmin):
-    list_display = ('patient', 'user', 'profile_photo')
-    search_fields = ('patient__name', 'user__username')
-
-# Register Patient and PatientLogin models
+# Register your models here.
+admin.site.register(Tag, TagAdmin)
 admin.site.register(Patient, PatientAdmin)
-admin.site.register(PatientLogin, PatientLoginAdmin)
 

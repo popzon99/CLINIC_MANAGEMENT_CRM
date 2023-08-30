@@ -1,0 +1,112 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Patients{% endblock %}</title>
+
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'patients/css/style.css' %}">
+
+    <!-- Optional: Add other global CSS or JS files here -->
+    <style>
+              
+        .profile-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 1;
+        }
+        
+        .profile-card {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 2;
+        }
+        
+        .profile-picture img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .patient-details {
+            margin-top: 20px;
+        }
+        
+        .profile-actions {
+            margin-top: 20px;
+        }
+        
+        .btn {
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: red;
+            border: none;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+
+
+    </style>
+
+</head>
+<body>
+
+    <header>
+        <!-- You can place a common header here with Bootstrap Navbar, etc. -->
+    </header>
+
+    <nav>
+        <!-- Bootstrap Navigation links can go here -->
+    </nav>
+
+    <div class="container mt-4">
+        <main>
+            {% block content %}
+            <!-- The content of derived templates will be inserted here -->
+            {% endblock %}
+        </main>
+    </div>
+
+    <footer>
+        <!-- Common footer information or links with Bootstrap styling -->
+    </footer>
+
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Custom JS -->
+    <script src="{% static 'patients/js/script.js' %}"></script>
+
+</body>
+</html>

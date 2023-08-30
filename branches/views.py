@@ -1,53 +1,29 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Branch
+from .forms import BranchForm, AddBranchForm
 
 def branches(request):
     branches_list = Branch.objects.all()
-
-    if request.method == 'POST':
-        name = request.POST.get('name')
-        email = request.POST.get('email')
-        address = request.POST.get('address')
-        phone_number = request.POST.get('phone_number')
-        is_working = request.POST.get('is_working') == 'on'
-
-        Branch.objects.create(
-            name=name,
-            email=email,
-            address=address,
-            phone_number=phone_number,
-            is_working=is_working
-        )
-        return redirect('branches')
-
     context = {'branches_list': branches_list}
-    return render(request, 'superadmin/branches.html', context)
+    return render(request, 'branches/branches.html', context)
 
 def update_branch(request, pk):
-    branch = Branch.objects.get(pk=pk)
+    branch = get_object_or_404(Branch, pk=pk)
 
     if request.method == 'POST':
-        name = request.POST.get('name')
-        email = request.POST.get('email')
-        address = request.POST.get('address')
-        phone_number = request.POST.get('phone_number')
-        is_working = request.POST.get('is_working') == 'on'
+        form = BranchForm(request.POST, instance=branch)
+        if form.is_valid():
+            form.save()
+            return redirect('branches')
+    else:
+        form = BranchForm(instance=branch)
 
-        branch.name = name
-        branch.email = email
-        branch.address = address
-        branch.phone_number = phone_number
-        branch.is_working = is_working
-        branch.save()
-
-        return redirect('branches')
-
-    context = {'branch': branch}
+    context = {'form': form, 'branch': branch}
     return render(request, 'branches/update_branch.html', context)
 
 def delete_branch(request, pk):
-    branch = Branch.objects.get(pk=pk)
-    
+    branch = get_object_or_404(Branch, pk=pk)
+
     if request.method == 'POST':
         branch.delete()
         return redirect('branches')
@@ -57,19 +33,12 @@ def delete_branch(request, pk):
 
 def add_branch(request):
     if request.method == 'POST':
-        name = request.POST.get('name')
-        email = request.POST.get('email')
-        address = request.POST.get('address')
-        phone_number = request.POST.get('phone_number')
-        is_working = request.POST.get('is_working') == 'on'
+        form = AddBranchForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('branches')
+    else:
+        form = AddBranchForm()
 
-        Branch.objects.create(
-            name=name,
-            email=email,
-            address=address,
-            phone_number=phone_number,
-            is_working=is_working
-        )
-        return redirect('branches')
-
-    return render(request, 'branches/add_branch.html')
+    context = {'form': form}
+    return render(request, 'branches/add_branch.html', context)

@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from physiotherapists.models import Speciality
+from branches.models import Branch
 
 BLOOD_GROUP_CHOICES = [
     ('A+', 'A+'),
@@ -17,8 +19,14 @@ GENDER_CHOICES = [
     ('female', 'Female'),
 ]
 
+class Tag(models.Model):
+    name = models.CharField(max_length=30)
+
+    def __str__(self):
+        return self.name
+
 class Patient(models.Model):
-    name = models.CharField(max_length=100)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='patient_profile')
     address = models.TextField()
     specialities = models.ManyToManyField('physiotherapists.Speciality')
     location = models.ForeignKey('branches.Branch', on_delete=models.CASCADE)
@@ -32,21 +40,21 @@ class Patient(models.Model):
     blood_group = models.CharField(max_length=5, choices=BLOOD_GROUP_CHOICES, null=True, blank=True)
     notes = models.TextField(null=True, blank=True)
     
-    # Login Information
-    email = models.EmailField(unique=True)  # Ensure unique email for login
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)  # User for authentication
+    # Profile photo with a default image (adjust the path accordingly)
+    profile_photo = models.ImageField(upload_to='patients/', default='path/to/default/image.jpg')
     
-    profile_photo = models.ImageField(upload_to='patients/', blank=True, null=True)
+    # Timestamp of when the patient is added
+    date_added = models.DateTimeField(auto_now_add=True)  
 
-    def __str__(self):
-        return self.name
+    # Suggestion: Adding a human-readable unique patient ID 
+    patient_id = models.CharField(max_length=10, unique=True)
 
-class PatientLogin(models.Model):
-    patient = models.OneToOneField(Patient, on_delete=models.CASCADE)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)  # User for authentication
-    # Additional login fields can be added here
+    # Tags for the patient
+    tags = models.ManyToManyField(Tag, blank=True)
     
-    profile_photo = models.ImageField(upload_to='patients/logins/', blank=True, null=True)
-
     def __str__(self):
-        return f"Login for {self.patient.name}"
+        return f"{self.user.first_name} {self.user.last_name}"
+
+    
+
+

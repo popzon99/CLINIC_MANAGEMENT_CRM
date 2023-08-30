@@ -1,80 +1,89 @@
 from django import forms
-from django.core.exceptions import ValidationError
-from .models import Patient
+from django.contrib.auth.forms import UserCreationForm
 from django.utils.translation import gettext_lazy as _
-from django import forms
 
-from .models import Patient
-from .models import GENDER_CHOICES, BLOOD_GROUP_CHOICES
+from .models import Patient, GENDER_CHOICES, BLOOD_GROUP_CHOICES, Tag
 from branches.models import Branch
 from physiotherapists.models import Speciality
-from django.utils.translation import gettext_lazy as _
 
-
-class AddPatientForm(forms.Form):
-    name = forms.CharField(max_length=100)
+class RegisterPatientForm(UserCreationForm):
+    # Basic Details
     address = forms.CharField(widget=forms.Textarea)
-    specialities = forms.ModelMultipleChoiceField(queryset=Speciality.objects.all())
-    location = forms.ModelChoiceField(queryset=Branch.objects.all())
     phone = forms.CharField(max_length=15)
     date_of_birth = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
     gender = forms.ChoiceField(choices=GENDER_CHOICES, widget=forms.RadioSelect)
-
+    
     # Medical Information
     height = forms.DecimalField(max_digits=5, decimal_places=2, required=False)
     weight = forms.DecimalField(max_digits=5, decimal_places=2, required=False)
     blood_group = forms.ChoiceField(choices=BLOOD_GROUP_CHOICES, required=False)
     notes = forms.CharField(widget=forms.Textarea, required=False)
-
-    # Login Information
-    email = forms.EmailField()
-    password = forms.CharField(widget=forms.PasswordInput)
-    confirm_password = forms.CharField(widget=forms.PasswordInput)
+    
+    # Additional Details
+    specialities = forms.ModelMultipleChoiceField(queryset=Speciality.objects.all(), required=False)
+    location = forms.ModelChoiceField(queryset=Branch.objects.all(), required=False)
     profile_photo = forms.ImageField(required=False)
 
-    def clean_email(self):
-        email = self.cleaned_data['email']
-        if Patient.objects.filter(email=email).exists():
-            raise forms.ValidationError(_("Email already exists."))
-        return email
-
-    def clean(self):
-        cleaned_data = super().clean()
-        password = cleaned_data.get('password')
-        confirm_password = cleaned_data.get('confirm_password')
-        if password != confirm_password:
-            raise forms.ValidationError(_("Passwords do not match."))
-
-class PatientProfileForm(forms.ModelForm):
     class Meta:
         model = Patient
-        fields = '__all__'
-        exclude = ['user', 'email']  # Exclude user-related fields from the form
+        fields = ['username', 'email', 'password1', 'password2', 'address', 'phone', 'date_of_birth', 'gender', 'height', 
+                  'weight', 'blood_group', 'notes', 'specialities', 'location', 'profile_photo']
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data['email']
+        if commit:
+            user.save()
+        
+        patient = Patient(user=user, **{field: self.cleaned_data[field] for field in self.Meta.fields if field not in ['username', 'email', 'password1', 'password2']})
+        if commit:
+            patient.save()
+        
+        return user
 
 
-GENDER_CHOICES = [ 
-    ('', 'All'),
-    ('male', 'Male'),
-    ('female', 'Female'),
-]
+
 
 class PatientFilterForm(forms.Form):
-    name = forms.CharField(label='Patient Name', required=False,
-                           widget=forms.TextInput(attrs={'placeholder': 'Enter patient name'}))
-    gender = forms.ChoiceField(label='Gender', choices=GENDER_CHOICES, required=False,
-                               widget=forms.Select(attrs={'class': 'custom-select'}))
-    # Add more filter fields as needed
+    name = forms.CharField(label='Patient Name', required=False, widget=forms.TextInput(attrs={'placeholder': 'Enter patient name'}))
+    phone = forms.CharField(label='Phone', required=False, widget=forms.TextInput(attrs={'placeholder': 'Enter phone number'}))
+    gender = forms.ChoiceField(label='Gender', choices=[('', 'All')] + list(GENDER_CHOICES), required=False, widget=forms.Select(attrs={'class': 'custom-select'}))
+    location = forms.ModelChoiceField(queryset=Branch.objects.all(), required=False)
+    speciality = forms.ModelMultipleChoiceField(queryset=Speciality.objects.all(), required=False)
+    tags = forms.ModelMultipleChoiceField(queryset=Tag.objects.all(), required=False)
+    date_added_from = forms.DateField(label='Date Added From', widget=forms.DateInput(attrs={'type': 'date'}), required=False)
+    date_added_to = forms.DateField(label='Date Added To', widget=forms.DateInput(attrs={'type': 'date'}), required=False)
+    order_by = forms.ChoiceField(label='Order By', choices=[('date_added', 'Date Added'), ('user__first_name', 'Name')], required=False, widget=forms.Select(attrs={'class': 'custom-select'}))
 
     def filter_queryset(self, queryset):
         name = self.cleaned_data.get('name')
+        phone = self.cleaned_data.get('phone')
         gender = self.cleaned_data.get('gender')
+        location = self.cleaned_data.get('location')
+        speciality = self.cleaned_data.get('speciality')
+        tags = self.cleaned_data.get('tags')
+        date_added_from = self.cleaned_data.get('date_added_from')
+        date_added_to = self.cleaned_data.get('date_added_to')
+        order_by = self.cleaned_data.get('order_by')
 
         if name:
-            queryset = queryset.filter(name__icontains=name)
-        
+            queryset = queryset.filter(user__first_name__icontains=name) | queryset.filter(user__last_name__icontains=name)
+        if phone:
+            queryset = queryset.filter(phone__icontains=phone)
         if gender:
             queryset = queryset.filter(gender=gender)
+        if location:
+            queryset = queryset.filter(location=location)
+        if speciality:
+            queryset = queryset.filter(specialities__in=speciality)
+        if tags:
+            queryset = queryset.filter(tags__in=tags)
+        if date_added_from:
+            queryset = queryset.filter(date_added__gte=date_added_from)
+        if date_added_to:
+            queryset = queryset.filter(date_added__lte=date_added_to)
+        if order_by:
+            queryset = queryset.order_by(order_by)
 
-        # ... Add more filter criteria as needed ...
+        return queryset.distinct()  # We add .distinct() to ensure that we don't get duplicate entries
 
-        return queryset
